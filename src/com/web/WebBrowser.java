@@ -106,12 +106,15 @@ public class WebBrowser extends JFrame {
 	 * 5.工具欄中新增按鈕元件<br>
 	 */
 	public WebBrowser() {
+		this.initBrowserObject();
+		
 		setTitle("網頁瀏灠器");
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		this.initBrowserObject();
+		
+		add(bar);
 		
 		setSize(500, 500);
 		
