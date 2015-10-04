@@ -62,9 +62,11 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 	//建立網頁顯示介面
 	private JTextField jurl = null;
 	/**
+	 * ★JEditorPane尚未能完整地的支援HTML所有標準，顯示時，HTML3.2標準的語法能完整呈現。
+	 * 而使用CSS/JavaScript的頁面，可能會無法完全完整顯示。<br>
 	 * 可編輯各種內容的文本元件。<br>
 	 * text/plain : 純文本 (default)<br>
-	 * text/html : HTML 文本<br>
+	 * text/html : HTML 文本，使用的工具套件是類別 javax.swing.text.html.HTMLEditorKit，支持 HTML 3.2<br>
 	 * text/rtf : RTF 文本
 	 */
 	private JEditorPane jEditorPane1 = null;
@@ -308,10 +310,21 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 				KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
 	}
 	
+	/**
+	 * 實現監聽器介面的hyperlinkUpdate函數
+	 */
 	@Override
 	public void hyperlinkUpdate(HyperlinkEvent e) {
-		System.out.println("HyperLink = " + e.getSource());
-		
+		System.out.println("HyperLink = " + e.getSource() +
+				"\ne.getEventType() = " + e.getEventType());
+		//ACTIVATED = 啟動型別
+		if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+			try {
+				jEditorPane1.setPage(e.getURL());
+			} catch (IOException e1) {
+				e1.printStackTrace(System.err);
+			}
+		}
 	}
 	
 	@Override
@@ -418,10 +431,46 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			window.setVisible(true);
 		} //查看原始檔案
 		else if(sourceObj == sourceItem || sourceObj == picView) {
-			System.out.println("★★★查看原始檔案★★★");
+			url = jurl.getText().toString().trim();
+			if(url.trim().length() > 0 &&
+					!(url.startsWith("http://") || url.startsWith("https://")))
+				url = "http://" + url;
+			if(url.trim().length() > 0) {
+				//根據URL取得原始碼
+				getHtmlSource(url);
+				//生成顯示原始碼的框架物件
+				ViewSourceFrame vsframe = new ViewSourceFrame(htmlSource);
+				vsframe.setBounds(0, 0, 800, 500);
+				vsframe.setVisible(true);
+			} else {
+				JOptionPane.showMessageDialog(WebBrowser.this, "請輸入網址", "網頁瀏覽器",
+						JOptionPane.ERROR_MESSAGE);
+			}
 		} //重載
 		else if(sourceObj == reloadItem) {
-			System.out.println("☆☆☆重載☆☆☆");
+			url = jurl .getText();
+			if(url.trim().length() > 0 &&
+					(url.startsWith("http://") || url.startsWith("https://")))
+			{
+				jEditorPane1.setText(url);
+				jEditorPane1.setEditable(false);
+				jEditorPane1.revalidate();
+				
+			} else if(url.trim().length() > 0 &&
+					!(url.startsWith("http://") || url.startsWith("https://"))) {
+				//加上http://
+				url = "http://" + url;
+				try {
+					//動作同IF Block
+					jEditorPane1.setPage(url);
+					jEditorPane1.setEditable(false);
+					jEditorPane1.revalidate();
+				} catch(Exception ex) {
+					//如果連結失敗，則彈出選擇對話視窗方塊"無法打開搜索頁"
+					JOptionPane.showMessageDialog(WebBrowser.this, "無法打開搜索頁", "網頁瀏覽器",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		}
 	}
 	
@@ -539,6 +588,33 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			}
 		};
 		thread.start();
+	}
+	
+	/**
+	 * 取得url網頁的原始碼
+	 * @param url
+	 */
+	private void getHtmlSource(String url) {
+		String linesep, htmlLine;
+		linesep = System.getProperty("line.separator");
+		htmlSource = "";
+		try {
+			URL source = new URL(url);
+			InputStream in = new BufferedInputStream(source.openStream());
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			while((htmlLine = br.readLine()) != null) {
+				htmlSource += htmlLine + linesep;
+			}
+			
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage(), "取得原始碼動作 Exception",
+					JOptionPane.ERROR_MESSAGE);
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+			JOptionPane.showMessageDialog(null, ioe.getMessage(), "取得原始碼動作 Exception",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	/**
