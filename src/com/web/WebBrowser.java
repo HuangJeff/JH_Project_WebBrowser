@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -55,12 +56,23 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 	 * serialVersionUID = 1L
 	 */
 	private static final long serialVersionUID = 1L;
+	/*
+	 * HTML 3.2 的網頁
+	 * http://www.cs.tut.fi/~jkorpela/HTML3.2/all.html
+	 * 
+	 */
+	private String[] defaultUrlList = new String[]{
+			"http://www.cs.tut.fi/~jkorpela/HTML3.2/all.html",
+			"http://www.december.com/html/3.2/"
+	};
 	
 	//建立工具欄來顯示位址欄
 	private JToolBar bar = null;
 	
-	//建立網頁顯示介面
-	private JTextField jurl = null;
+	/** 網址列 */
+	//private JTextField jurl = null;
+	private JComboBox<String[]> jurl = null;
+	
 	/**
 	 * ★JEditorPane尚未能完整地的支援HTML所有標準，顯示時，HTML3.2標準的語法能完整呈現。
 	 * 而使用CSS/JavaScript的頁面，可能會無法完全完整顯示。<br>
@@ -192,7 +204,13 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 		//建立工具欄來顯示位址欄
 		bar = new JToolBar();
 		//建立網頁顯示介面
-		jurl = new JTextField(60);
+		//jurl = new JTextField(60);
+		jurl = new JComboBox<String[]>();
+		jurl.setEditable(true);
+		for(String _urlItem : defaultUrlList) {
+			jurl.setSelectedItem(_urlItem);
+		}
+		
 		jEditorPane1 = new JEditorPane();
 		scrollPane = new JScrollPane(jEditorPane1);
 		
@@ -340,7 +358,9 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			this.pressEnterUrlTxtField();
 		} //另存為...
 		else if(sourceObj == picSave || sourceObj == saveAsItem) {
-			url = jurl.getText().toString().trim();
+			//url = jurl.getText().toString().trim();
+			url = jurl.getSelectedItem().toString().trim();
+			
 			if(url.trim().length() > 0 &&
 					!(url.startsWith("http://") || url.startsWith("https://")))
 			{
@@ -365,14 +385,17 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			//獲得history中本網址之前訪問的網址
 			url = history.get(historyIndex);
 			if(url == null || url.trim().length() == 0)
-				url = jurl.getText();
+				//url = jurl.getText();
+				url = jurl.getSelectedItem().toString();
 			//重整jEditorPane1內容
 			try {
 				jEditorPane1.setPage(url);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			jurl.setText(url);
+			//jurl.setText(url);
+			jurl.setSelectedItem(url);
+			
 			jEditorPane1.setEditable(false);
 			jEditorPane1.revalidate();
 		} //前進 forward
@@ -383,14 +406,17 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			//url = jurl.getText();
 			url = history.get(historyIndex);
 			if(url == null || url.trim().length() == 0)
-				url = jurl.getText();
+				//url = jurl.getText();
+				url = jurl.getSelectedItem().toString();
 			//重整jEditorPane1內容
 			try {
 				jEditorPane1.setPage(url);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			jurl.setText(url);
+			//jurl.setText(url);
+			jurl.setSelectedItem(url);
+			
 			jEditorPane1.setEditable(false);
 			jEditorPane1.revalidate();
 		} //全屏
@@ -431,7 +457,9 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			window.setVisible(true);
 		} //查看原始檔案
 		else if(sourceObj == sourceItem || sourceObj == picView) {
-			url = jurl.getText().toString().trim();
+			//url = jurl.getText().toString().trim();
+			url = jurl.getSelectedItem().toString().trim();
+			
 			if(url.trim().length() > 0 &&
 					!(url.startsWith("http://") || url.startsWith("https://")))
 				url = "http://" + url;
@@ -448,7 +476,9 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			}
 		} //重載
 		else if(sourceObj == reloadItem) {
-			url = jurl .getText();
+			//url = jurl .getText();
+			url = jurl.getSelectedItem().toString();
+			
 			if(url.trim().length() > 0 &&
 					(url.startsWith("http://") || url.startsWith("https://")))
 			{
@@ -478,7 +508,9 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 	 * 重新導向按鈕
 	 */
 	private void redirectBtn() {
-		String url = jurl.getText();
+		//String url = jurl.getText();
+		String url = jurl.getSelectedItem().toString();
+		
 		//檢查URL
 		//url不為空，且以http:// 開頭
 		if(url != null && url.trim().length() > 0 &&
