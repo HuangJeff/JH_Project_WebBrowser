@@ -4,8 +4,13 @@
 package com.web;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +35,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -71,7 +77,7 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 	
 	/** 網址列 */
 	//private JTextField jurl = null;
-	private JComboBox<String[]> jurl = null;
+	private JComboBox<String> jurl = null;
 	
 	/**
 	 * ★JEditorPane尚未能完整地的支援HTML所有標準，顯示時，HTML3.2標準的語法能完整呈現。
@@ -147,7 +153,14 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 		
 		setTitle("網頁瀏灠器");
 		setResizable(false);
-		setLocationRelativeTo(null);
+		//置中方法一：
+		//setLocationRelativeTo(null);
+		//置中方法二：
+		//getCenterPoint() = 返回 Windows 應居中的點。
+		//		建議使用 getMaximumWindowBounds() 檢查居中的 Windows，以確保它們適合有效的顯示區域。(不然右邊會跑出邊界，如此例)
+		//Point centerPoint = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+		//setLocation(centerPoint.x, centerPoint.y);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		//將功能表項saveAsItme加入到功能表組fileMenu中
@@ -205,11 +218,17 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 		bar = new JToolBar();
 		//建立網頁顯示介面
 		//jurl = new JTextField(60);
-		jurl = new JComboBox<String[]>();
+		
+		jurl = new JComboBox<String>();
 		jurl.setEditable(true);
-		for(String _urlItem : defaultUrlList) {
-			jurl.setSelectedItem(_urlItem);
-		}
+		//設置Model
+		MyComboBoxModel comboModel = new MyComboBoxModel(defaultUrlList);
+		jurl.setModel(comboModel);
+		//設置渲染器
+		MyCellRenderer cellRenderer = new MyCellRenderer();
+		//重設comboBox元件大小size
+		cellRenderer.setPreferredSize(new Dimension(600, 20));
+		jurl.setRenderer(cellRenderer);
 		
 		jEditorPane1 = new JEditorPane();
 		scrollPane = new JScrollPane(jEditorPane1);
@@ -691,4 +710,64 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			}
 		});
 	}
+	
+	class MyComboBoxModel extends javax.swing.DefaultComboBoxModel<String> {
+		private static final long serialVersionUID = 1L;
+		
+		private String[] aryOfData = null;
+		/**
+		 * Constructor
+		 * @param aryOfData : 資料集
+		 */
+		public MyComboBoxModel(String[] aryOfData) {
+			super(aryOfData);
+			this.aryOfData = aryOfData;
+		}
+		
+		
+		
+	}
+	
+	class MyCellRenderer extends JLabel implements javax.swing.ListCellRenderer<String> {
+		private static final long serialVersionUID = -2209769953515227417L;
+		
+		public MyCellRenderer() {
+			/*
+			 * setOpaque(default false) 透明度
+			 * 如果為 true，則該元件繪製其邊界內的所有像素。否則該元件可能不繪製部分或所有像素，從而允許其底層像素透視出來。
+			 */
+			//要設為true，這樣list.getSelectionBackground()才會顯現出來
+			setOpaque(true);
+		}
+		
+		@Override
+		public Component getListCellRendererComponent(
+				JList<? extends String> list, String value, int index,
+				boolean isSelected, boolean cellHasFocus) {
+			setText(value);
+			
+			Color background = null;
+			Color foreground = null;
+			
+			if (isSelected) {
+				background = list.getSelectionBackground();
+				foreground = Color.RED;
+                
+                setFont(list.getFont().deriveFont(Font.ITALIC));
+                setFont(list.getFont().deriveFont(Font.BOLD));
+            } else {
+            	background = list.getBackground();
+				foreground = list.getForeground();
+                
+                setFont(list.getFont());
+            }
+			
+			setBackground(background);
+            setForeground(foreground);
+			
+			return this;
+		}
+		
+	}
+	
 }
