@@ -751,7 +751,7 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			
 			if (isSelected) {
 				background = list.getSelectionBackground();
-				foreground = Color.RED;
+				foreground = Color.CYAN;
                 
                 setFont(list.getFont().deriveFont(Font.ITALIC));
                 setFont(list.getFont().deriveFont(Font.BOLD));
