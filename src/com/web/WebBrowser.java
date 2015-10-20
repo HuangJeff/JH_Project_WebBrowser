@@ -62,14 +62,18 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 	 * serialVersionUID = 1L
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private static final String HTTP = "http://";
+	private static final String HTTPS = "https://";
+	
 	/*
 	 * HTML 3.2 的網頁
-	 * http://www.cs.tut.fi/~jkorpela/HTML3.2/all.html
-	 * 
 	 */
 	private String[] defaultUrlList = new String[]{
+			"http://www.w3.org/TR/REC-html32",
 			"http://www.cs.tut.fi/~jkorpela/HTML3.2/all.html",
-			"http://www.december.com/html/3.2/"
+			"http://www.december.com/html/3.2/",
+			"https://www.cs.tut.fi/~jkorpela/HTML3.2/5.54.html"
 	};
 	
 	//建立工具欄來顯示位址欄
@@ -352,8 +356,8 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 	 */
 	@Override
 	public void hyperlinkUpdate(HyperlinkEvent e) {
-		System.out.println("HyperLink = " + e.getSource() +
-				"\ne.getEventType() = " + e.getEventType());
+		//System.out.println("HyperLink = " + e.getSource() +
+		//		"\ne.getEventType() = " + e.getEventType());
 		//ACTIVATED = 啟動型別
 		if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 			try {
@@ -371,19 +375,19 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 		System.out.println("Action = " + sourceObj);
 		//點擊轉向按鈕
 		if(sourceObj == button) {
-			this.redirectBtn();
+			this.redirect();
 		} //輸入網址後，Enter
 		else if(sourceObj == jurl) {
-			this.pressEnterUrlTxtField();
+			this.redirect();
 		} //另存為...
 		else if(sourceObj == picSave || sourceObj == saveAsItem) {
 			//url = jurl.getText().toString().trim();
 			url = jurl.getSelectedItem().toString().trim();
 			
 			if(url.trim().length() > 0 &&
-					!(url.startsWith("http://") || url.startsWith("https://")))
+					!(url.startsWith(HTTP) || url.startsWith(HTTPS)))
 			{
-				url = "http://" + url;
+				url = HTTP + url;
 			}
 			if(url.trim().length() > 0) {
 				//保存檔
@@ -480,8 +484,8 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			url = jurl.getSelectedItem().toString().trim();
 			
 			if(url.trim().length() > 0 &&
-					!(url.startsWith("http://") || url.startsWith("https://")))
-				url = "http://" + url;
+					!(url.startsWith(HTTP) || url.startsWith(HTTPS)))
+				url = HTTP + url;
 			if(url.trim().length() > 0) {
 				//根據URL取得原始碼
 				getHtmlSource(url);
@@ -497,18 +501,11 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 		else if(sourceObj == reloadItem) {
 			//url = jurl .getText();
 			url = jurl.getSelectedItem().toString();
-			
-			if(url.trim().length() > 0 &&
-					(url.startsWith("http://") || url.startsWith("https://")))
-			{
-				jEditorPane1.setText(url);
-				jEditorPane1.setEditable(false);
-				jEditorPane1.revalidate();
-				
-			} else if(url.trim().length() > 0 &&
-					!(url.startsWith("http://") || url.startsWith("https://"))) {
-				//加上http://
-				url = "http://" + url;
+			if(url != null && url.trim().length() > 0) {
+				if(!(url.startsWith(HTTP) || url.startsWith(HTTPS))) {
+					//加上http://
+					url = HTTP + url;
+				}
 				try {
 					//動作同IF Block
 					jEditorPane1.setPage(url);
@@ -524,16 +521,23 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 	}
 	
 	/**
-	 * 重新導向按鈕
+	 * URL重新導向按
 	 */
-	private void redirectBtn() {
+	private void redirect() {
 		//String url = jurl.getText();
 		String url = jurl.getSelectedItem().toString();
 		
 		//檢查URL
-		//url不為空，且以http:// 開頭
-		if(url != null && url.trim().length() > 0 &&
-				(url.startsWith("http://") || url.startsWith("https://"))) {
+		if(url == null || url.trim().length() == 0)
+		{
+			//url為空
+			JOptionPane.showMessageDialog(WebBrowser.this, "請輸入網址", "網頁瀏覽器",
+					JOptionPane.ERROR_MESSAGE);
+		} else {
+			if(!(url.startsWith(HTTP) || url.startsWith(HTTPS))) {
+				//加上http://
+				url = HTTP + url;
+			}
 			try {
 				//jEditorPane1元件顯示url的連結內容
 				jEditorPane1.setPage(url);
@@ -555,36 +559,7 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 				JOptionPane.showMessageDialog(WebBrowser.this, "無法打開搜索頁", "網頁瀏覽器",
 						JOptionPane.ERROR_MESSAGE);
 			}
-		} //url 不為空，但亦不以http:// 開頭
-		else if(url.trim().length() > 0 &&
-				!(url.startsWith("http://") || url.startsWith("https://"))) {
-			//加上http://
-			url = "http://" + url;
-			try {
-				//動作同IF Block
-				jEditorPane1.setPage(url);
-				history.add(url);
-				historyIndex = history.size() - 1;
-				jEditorPane1.setEditable(false);
-				jEditorPane1.revalidate();
-			} catch(Exception e) {
-				//如果連結失敗，則彈出選擇對話視窗方塊"無法打開搜索頁"
-				JOptionPane.showMessageDialog(WebBrowser.this, "無法打開搜索頁", "網頁瀏覽器",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		} else {
-			//url為空
-			JOptionPane.showMessageDialog(WebBrowser.this, "請輸入網址", "網頁瀏覽器",
-					JOptionPane.ERROR_MESSAGE);
 		}
-	}
-	
-	/**
-	 * 於URL輸入欄中，Press Enter
-	 */
-	private void pressEnterUrlTxtField() {
-		//TODO 動作均同(抽出)
-		this.redirectBtn();
 	}
 	
 	/**
@@ -593,7 +568,7 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 	 */
 	private void saveFile(final String url) {
 		final String linesep = System.getProperty("line.separator");
-		System.out.println("System.getProperty('line.separator') = " + linesep);
+		//System.out.println("System.getProperty('line.separator') = " + linesep);
 		chooser1.setCurrentDirectory(new File("."));
 		chooser1.setDialogType(JFileChooser.SAVE_DIALOG);
 		chooser1.setDialogTitle("另存為...");
