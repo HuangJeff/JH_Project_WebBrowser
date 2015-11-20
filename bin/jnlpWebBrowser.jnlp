@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="" href="">
+<jnlp spec="1.0+" codebase="file:///E:\8.Eclipse Workspace\project01_workspace\WebBrowser\bin" href="jnlpWebBrowser.jnlp">
     <information>
-        <title>Dynamic Tree Demo</title>
+        <title>WebBrowser Demo</title>
         <vendor>Dynamic Team</vendor>
         <icon href="sometree-icon.jpg"/>
         <offline-allowed/>
