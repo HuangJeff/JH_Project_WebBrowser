@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="WebBrowser Build" default="sign-all-jars" basedir="..">
+	<!-- set global properties for this build -->
+	<property name="ProjectName" value="WebBrowser"/>
+	
+	<!-- PATH -->
+	<property name="deploy" location="deploy"/>
+	<property name="src" location="src"/>
+	<property name="bin" location="bin"/>
+	<property name="classes" location="classes"/>
+	
+	<!-- FILE -->
+	<property name="ProjectJarFileName" value="${ProjectName}.jar"/>
+	
+	<!-- also need to change the jarsigner info -->
+	<property name="alias" value="jeff"/>
+	<property name="storepass" value="1qaz2wsx"/>
+	<property name="keystore" value="${deploy}/keystore/.myKeys7200"/>
+	<property name="keypass" value="1qaz2wsx"/>
+	
+	
+	<target name="start_point">
+		<echo>+---------------------------------------+</echo>
+		<echo level="info">幾種echo使用方式：${bin} </echo>
+		<echo message="${src}" level="info"/>
+		<echo>WebBrowser 建制方式
+				啟動。	</echo>
+    	<echo>+---------------------------------------+</echo>
+    	
+    	
+    	
+	</target>
+	
+	<target name="buildJar" depends="clean">
+		<echo>+---------------------------------------+</echo>
+		<echo> build Jar </echo>
+    	<echo>+---------------------------------------+</echo>
+    	
+    	<jar destfile="${bin}/${ProjectJarFileName}" basedir="${classes}" update="true"/>
+    	
+	</target>
+	
+	<target name="sign-all-jars" depends="buildJar">
+	    <echo>+---------------------------------------+</echo>
+	    <echo>               sign-all-jar              </echo>
+	    <echo>+---------------------------------------+</echo>
+	    <!--copy todir="${deploy.sign.dir}">
+	      <fileset dir="${deploy.app.dir}" includes="OratechEms.jar"/>               
+	    </copy>
+	    <copy todir="${deploy.sign.dir}">
+	      <fileset dir="${deploy.lib.dir}" includes="**/*.jar"/>               
+	    </copy-->
+	    <signjar
+	      alias="${alias}"
+	      storepass="${storepass}"
+	      keystore="${keystore}"
+	      keypass="${keypass}"
+	      jar="${bin}/${ProjectJarFileName}">
+	    </signjar>
+	  </target>
+	
+	<target name="clean">
+		<echo>+---------------------------------------+</echo>
+		<echo> clean All File </echo>
+    	<echo>+---------------------------------------+</echo>
+    	<!-- remove jar file -->
+    	<delete file="${bin}/${ProjectJarFileName}" />
+    	
+    	
+	</target>
+	
+</project>
