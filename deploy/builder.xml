@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="WebBrowser Build" default="sign-all-jars" basedir="..">
+<project name="WebBrowser Build" default="start_point" basedir="..">
 	<!-- set global properties for this build -->
 	<property name="ProjectName" value="WebBrowser"/>
 	
@@ -19,7 +19,7 @@
 	<property name="keypass" value="1qaz2wsx"/>
 	
 	
-	<target name="start_point">
+	<target name="start_point" depends="sign-all-jars">
 		<echo>+---------------------------------------+</echo>
 		<echo level="info">幾種echo使用方式：${bin} </echo>
 		<echo message="${src}" level="info"/>
@@ -28,15 +28,6 @@
     	<echo>+---------------------------------------+</echo>
     	
     	
-    	
-	</target>
-	
-	<target name="buildJar" depends="clean">
-		<echo>+---------------------------------------+</echo>
-		<echo> build Jar </echo>
-    	<echo>+---------------------------------------+</echo>
-    	
-    	<jar destfile="${bin}/${ProjectJarFileName}" basedir="${classes}" update="true"/>
     	
 	</target>
 	
@@ -57,7 +48,31 @@
 	      keypass="${keypass}"
 	      jar="${bin}/${ProjectJarFileName}">
 	    </signjar>
-	  </target>
+	</target>
+	
+	<target name="buildJar" depends="compile">
+		<echo>+---------------------------------------+</echo>
+		<echo> build Jar </echo>
+    	<echo>+---------------------------------------+</echo>
+    	
+    	<jar destfile="${bin}/${ProjectJarFileName}" basedir="${classes}" update="true"/>
+    	
+	</target>
+	
+	<target name="compile" depends="clean">
+		<echo>+---------------------------------------+</echo>
+		<echo> compile </echo>
+    	<echo>+---------------------------------------+</echo>
+    	
+    	<javac srcdir="${src}"
+			destdir="${classes}"
+         	fork="true"
+         	debug="on"
+         	encoding="UTF-8"
+         	includeantruntime="no"
+  		/>
+    	
+	</target>
 	
 	<target name="clean">
 		<echo>+---------------------------------------+</echo>
@@ -66,7 +81,11 @@
     	<!-- remove jar file -->
     	<delete file="${bin}/${ProjectJarFileName}" />
     	
-    	
+    	<!-- remove classes -->
+    	<!-- includes="**/*" 要這樣設，才能remove all -->
+    	<delete includeEmptyDirs="true">
+			<fileset dir="${classes}" includes="**/*"/>
+		</delete>
 	</target>
 	
 </project>
