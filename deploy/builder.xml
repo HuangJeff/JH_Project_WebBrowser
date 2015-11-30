@@ -26,8 +26,9 @@
 		<echo>WebBrowser 建制方式
 				啟動。	</echo>
     	<echo>+---------------------------------------+</echo>
-    	
-    	
+    	<echo>Change JAR File Name</echo>
+    	<!-- 方便上傳 -->
+    	<move file="${bin}/${ProjectJarFileName}" tofile="${bin}/${ProjectJarFileName}.tmp" />
     	
 	</target>
 	
