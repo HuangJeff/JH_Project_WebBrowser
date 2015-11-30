@@ -70,7 +70,7 @@
          	fork="true"
          	debug="on"
          	encoding="UTF-8"
-         	includeantruntime="no"
+         	includeAntRuntime="no"
   		/>
     	
 	</target>
