@@ -696,9 +696,6 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			super(aryOfData);
 			this.aryOfData = aryOfData;
 		}
-		
-		
-		
 	}
 	
 	class MyCellRenderer extends JLabel implements javax.swing.ListCellRenderer<String> {
@@ -740,7 +737,6 @@ public class WebBrowser extends JFrame implements HyperlinkListener, ActionListe
 			
 			return this;
 		}
-		
 	}
 	
 }
